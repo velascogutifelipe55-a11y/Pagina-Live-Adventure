@@ -1,0 +1,48 @@
+=============================
+  API PARQUE DE DIVERSIONES EXTREMAS
+=============================
+BASE URL: http://localhost/parque-aventura
+
+--- MÓDULO 1: SERVICIOS ---
+
+1. Listar todos los servicios
+   URL: /servicios/listar.php
+   Método: GET
+   Respuesta: Lista completa de servicios
+
+2. Consultar servicio por ID
+   URL: /servicios/consultar.php
+   Método: POST
+   Cuerpo: { "id": 1 }
+
+3. Registrar nuevo servicio
+   URL: /servicios/crear.php
+   Método: POST
+   Cuerpo: {
+     "nombre": "Nombre del servicio",
+     "descripcion": "Detalles...",
+     "precio": 50000,
+     "duracion": "1 hr",
+     "cupo_maximo": 15
+   }
+
+4. Eliminar servicio
+   URL: /servicios/eliminar.php
+   Método: POST
+   Cuerpo: { "id": 3 }
+
+--- MÓDULO 2: RESERVAS ---
+
+1. Crear reserva
+   URL: /reservas/crear.php
+   Método: POST
+   Cuerpo: {
+     "servicio_id": 2,
+     "nombre_cliente": "Felipe Velasco",
+     "fecha_reserva": "2026-09-15",
+     "cantidad_personas": 2
+   }
+
+2. Listar reservas
+   URL: /reservas/listar.php
+   Método: GET
