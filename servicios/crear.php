@@ -1,40 +1,32 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
 
 require_once "../config/conexion.php";
+require_once "../modelos/Servicio.php";
+
 $conexion = new Conexion();
-$conn = $conexion->conectar();
+$db = $conexion->conectar();
 
-$datos = json_decode(file_get_contents("php://input"), true);
+$servicio = new Servicio($db);
 
-// Validar campos obligatorios
-if (empty($datos['nombre']) || empty($datos['precio'])) {
-    echo json_encode(["estado" => "error", "mensaje" => "Nombre y precio son obligatorios"]);
-    exit;
-}
+$entrada = json_decode(file_get_contents("php://input"), true);
 
-$nombre = $datos['nombre'];
-$descripcion = $datos['descripcion'] ?? "";
-$precio = $datos['precio'];
-$duracion = $datos['duracion'] ?? "";
-$cupo = $datos['cupo_maximo'] ?? 10;
+$datos = [
+    "nombre" => $entrada["nombre"] ?? "",
+    "descripcion" => $entrada["descripcion"] ?? "",
+    "precio" => $entrada["precio"] ?? 0,
+    "duracion" => $entrada["duracion"] ?? "",
+    "cupo_maximo" => $entrada["cupo_maximo"] ?? 0
+];
 
-$sql = "INSERT INTO servicios (nombre, descripcion, precio, duracion, cupo_maximo) VALUES (?, ?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ssds i", $nombre, $descripcion, $precio, $duracion, $cupo);
+$nuevo_id = $servicio->crear($datos);
 
-if ($stmt->execute()) {
-    echo json_encode([
-        "estado" => "exito",
-        "mensaje" => "Servicio registrado correctamente",
-        "id_generado" => $conn->insert_id
-    ]);
+if ($nuevo_id) {
+    echo json_encode(["estado" => "exito", "mensaje" => "Servicio creado", "id" => $nuevo_id]);
 } else {
-    echo json_encode(["estado" => "error", "mensaje" => "Error al registrar: " . $stmt->error]);
+    echo json_encode(["estado" => "error", "mensaje" => "No se pudo crear"]);
 }
 
-$stmt->close();
-$conn->close();
+$db->close();
 ?>

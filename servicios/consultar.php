@@ -1,33 +1,32 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
 
 require_once "../config/conexion.php";
+require_once "../modelos/Servicio.php";
+
 $conexion = new Conexion();
-$conn = $conexion->conectar();
+$db = $conexion->conectar();
 
-$datos = json_decode(file_get_contents("php://input"), true);
+$servicio = new Servicio($db);
 
-if (empty($datos['id'])) {
-    echo json_encode(["estado" => "error", "mensaje" => "El ID es obligatorio"]);
+$entrada = json_decode(file_get_contents("php://input"), true);
+$id = $entrada["id"] ?? 0;
+
+if ($id == 0) {
+    echo json_encode(["estado" => "error", "mensaje" => "Falta el ID"]);
+    $db->close();
     exit;
 }
 
-$id = $datos['id'];
-$sql = "SELECT * FROM servicios WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$resultado = $stmt->get_result();
+$resultado = $servicio->consultarPorId($id);
 
-if ($resultado->num_rows === 0) {
-    echo json_encode(["estado" => "error", "mensaje" => "Servicio no encontrado"]);
+if ($resultado->num_rows > 0) {
+    $serv = $resultado->fetch_assoc();
+    echo json_encode(["estado" => "exito", "servicio" => $serv]);
 } else {
-    $servicio = $resultado->fetch_assoc();
-    echo json_encode(["estado" => "exito", "servicio" => $servicio]);
+    echo json_encode(["estado" => "error", "mensaje" => "Servicio no encontrado"]);
 }
 
-$stmt->close();
-$conn->close();
+$db->close();
 ?>

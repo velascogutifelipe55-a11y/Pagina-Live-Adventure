@@ -1,38 +1,31 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
 
 require_once "../config/conexion.php";
+require_once "../modelos/Reserva.php";
+
 $conexion = new Conexion();
-$conn = $conexion->conectar();
+$db = $conexion->conectar();
 
-$datos = json_decode(file_get_contents("php://input"), true);
+$reserva = new Reserva($db);
 
-if (empty($datos['servicio_id']) || empty($datos['nombre_cliente']) || empty($datos['fecha_reserva'])) {
-    echo json_encode(["estado" => "error", "mensaje" => "Faltan datos obligatorios"]);
-    exit;
-}
+$entrada = json_decode(file_get_contents("php://input"), true);
 
-$servicio_id = $datos['servicio_id'];
-$nombre_cliente = $datos['nombre_cliente'];
-$fecha_reserva = $datos['fecha_reserva'];
-$cantidad = $datos['cantidad_personas'] ?? 1;
+$datos = [
+    "servicio_id" => $entrada["servicio_id"] ?? 0,
+    "nombre_cliente" => $entrada["nombre_cliente"] ?? "",
+    "fecha_reserva" => $entrada["fecha_reserva"] ?? "",
+    "cantidad_personas" => $entrada["cantidad_personas"] ?? 0
+];
 
-$sql = "INSERT INTO reservas (servicio_id, nombre_cliente, fecha_reserva, cantidad_personas) VALUES (?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("issi", $servicio_id, $nombre_cliente, $fecha_reserva, $cantidad);
+$nueva_reserva = $reserva->crear($datos);
 
-if ($stmt->execute()) {
-    echo json_encode([
-        "estado" => "exito",
-        "mensaje" => "Reserva realizada con éxito",
-        "numero_reserva" => $conn->insert_id
-    ]);
+if ($nueva_reserva) {
+    echo json_encode(["estado" => "exito", "mensaje" => "Reserva creada", "id" => $nueva_reserva]);
 } else {
-    echo json_encode(["estado" => "error", "mensaje" => "Error al reservar: " . $stmt->error]);
+    echo json_encode(["estado" => "error", "mensaje" => "No se pudo crear la reserva"]);
 }
 
-$stmt->close();
-$conn->close();
+$db->close();
 ?>

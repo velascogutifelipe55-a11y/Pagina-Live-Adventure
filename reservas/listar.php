@@ -3,25 +3,24 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
+require_once "../modelos/Reserva.php";
+
 $conexion = new Conexion();
-$conn = $conexion->conectar();
+$db = $conexion->conectar();
 
-$sql = "SELECT r.*, s.nombre as nombre_servicio, s.precio 
-        FROM reservas r 
-        INNER JOIN servicios s ON r.servicio_id = s.id 
-        ORDER BY fecha_reserva DESC";
+$reserva = new Reserva($db);
+$resultado = $reserva->listar();
 
-$resultado = $conn->query($sql);
-$reservas = [];
+$lista = [];
 while ($fila = $resultado->fetch_assoc()) {
-    $reservas[] = $fila;
+    $lista[] = $fila;
 }
 
 echo json_encode([
     "estado" => "exito",
-    "cantidad" => count($reservas),
-    "reservas" => $reservas
+    "cantidad" => count($lista),
+    "reservas" => $lista
 ]);
 
-$conn->close();
+$db->close();
 ?>

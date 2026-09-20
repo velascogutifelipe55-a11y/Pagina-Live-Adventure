@@ -1,21 +1,20 @@
-# API — Parque de Diversiones Extremas
+# Live Adventure - Sistema de Reservas
 
-## Servicios Disponibles
-- 🪂 Canopy / Tirolesa
-- 🪝 Paracaidismo
-- 🥾 Senderismo
-- 🚴 Ciclo Montañismo
-- 🏄 Piscina Surf
+Sistema web para la gestión de servicios y reservas de un parque de aventuras extremas.
 
 ## Tecnologías
-- PHP 7+
-- MySQL
-- Arquitectura API REST
+- Backend: PHP 7.4+
+- Base de Datos: MySQL 8.0
+- Servidor: Apache (XAMPP)
+- Pruebas: Postman
 
-## Autenticación
-No requiere token — validación por campos en cada petición.
+## Estructura
+- config/      → Conexión a la base de datos
+- modelos/     → Lógica de datos (Servicio, Reserva)
+- controladores/ → Lógica de negocio
+- api/         → Puntos de entrada
+- utils/       → Respuestas y validaciones reutilizables
+- docs/        → Documentación del proyecto
 
-## Códigos de Respuesta
-- ✅ 200 OK — Petición exitosa
-- ❌ 400 — Datos incompletos o error del cliente
-- ❌ 500 — Error del servidor
+## Autor
+Felipe Velasco Gutiérrez
